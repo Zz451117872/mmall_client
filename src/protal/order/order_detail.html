@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script type="text/javascript" src="../../../js/common/jquery.js" ></script>
+		<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+		<style type="text/css">
+			table tr{
+				text-align: center;
+			}
+		</style>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				//获取传入页面的订单号参数
+				var orderNo = getParams("orderNo");
+				//加载订单
+				if(orderNo != null){
+					sendRequest("order/order_detail.do",{"orderNo":orderNo},fillOrderToPage);
+				}
+				//给支付按钮添加点击事件
+				$("#to_pay_button").click(function(){
+					var orderNo = $("#orderNo").text();
+					if(orderNo != null && orderNo != "")
+					{
+						sendRequest("order/pay.do",{"orderNo":orderNo},payFallback);
+					}else{
+						alert("没有订单")
+					}
+				});
+				//给取消订单按钮添加点击事件
+				$("#cancle_order_button").click(function(){
+					var orderNo = $("#orderNo").text();
+					if(orderNo != null && orderNo != "")
+					{
+						sendRequest("order/cancel_order.do",{"orderNo":orderNo},refresh);
+					}else{
+						alert("没有订单")
+					}
+				});
+				//给确认收货添加点击事件
+				$("#verify_accepted_button").click(function(){
+					var orderNo = $("#orderNo").text();
+					if(orderNo != null && orderNo != "")
+					{
+						sendRequest("order/verify_accepted.do",{"orderNo":orderNo},refresh);
+					}else{
+						alert("没有订单")
+					}
+				});
+			});
+			// 不同的订单状态 显示 不同的操作按钮
+			function initPage(status)
+			{
+				if(status == 0)
+				{
+					$(".no_pay").show();
+					$(".no_received").hide();
+				}else if(status == 3)
+				{
+					$(".no_pay").hide();
+					$(".no_received").show();
+				}else{
+					$(".no_pay").hide();
+					$(".no_received").hide();
+				}
+				
+			}
+			//支付回调
+			function payFallback(map)
+			{
+				location.href = "/mmall/src/protal/pay/qr.html?orderNo="+map.orderNo+"&qrUrl="+map.qrUrl;
+			}
+			//刷新页面
+			function refresh()
+			{
+				var orderNo = $("#orderNo").text();
+				location.href = "order_detail.html?orderNo="+orderNo;
+			}
+			//填充订单信息到页面	
+			function fillOrderToPage(order)
+			{
+				$("#orderNo").text(order.id);
+				$("#payment").text(order.payment);
+				$("#payTypeDesc").text(order.payTypeDesc);
+				$("#postage").text(order.postage);
+				$("#statusDesc").text(order.statusDesc);
+				$("#payTime").text(order.payTime);
+				$("#sendTime").text(order.sendTime);
+				$("#endTime").text(order.endTime);
+				$("#closeTim").text(order.closeTim);
+				$("#createTim").text(order.createTim);
+				
+				initPage(order.status);
+				var orderItems = order.orderItemVOList;
+				if(orderItems != null)
+				{
+					$(".new_add_order_item").remove();
+					for(var i=0; i<orderItems.length; i++)
+					{
+						fillOrderItemToPage(orderItems[i],Number(i)+1);
+					}
+				}
+				var shipping = order.shippingVO;
+				if(shipping != null)
+				{
+					$(".new_add_shipping").remove();
+					fillShippingToPage(shipping);
+				}
+			}
+			
+			function fillOrderItemToPage(orderItem,i)
+			{
+				var tr = $("<tr class='new_add_cart_item'></tr>");
+				var td = $("<td>"+i+"</td>");
+				tr.append(td);
+				td = $("<td>"+orderItem.productName+"</td>");
+				tr.append(td);
+				td = $("<td><img src='"+orderItem.productImage+"' /></td>");
+				tr.append(td);
+				td = $("<td>"+orderItem.currentUnitPrice+"</td>");
+				tr.append(td);
+				td = $("<td>"+orderItem.quantity+"</td>");
+				tr.append(td);
+				td = $("<td>"+orderItem.totalPrice+"</td>");
+				tr.append(td);
+				
+				$("#order_item_table").append(tr);
+			}
+			
+			function fillShippingToPage(shipping)
+			{
+				var div = $("<div style='border: 1px ;' class='new_add_shipping'></div>");
+				var span = $("<span>收货人："+shipping.receiverName+"&nbsp;&nbsp;&nbsp;&nbsp;</span>");
+				div.append(span);
+				span = $("<span>电话："+shipping.receiverPhone+"</span>");
+				div.append(span).append("<br />");
+				var address = shipping.receiverProvince+"&nbsp;"+
+						shipping.receiverCity+"&nbsp;"+
+						shipping.receiverDistrict+"&nbsp;"+
+						shipping.receiverAddress+"&nbsp;";
+				span = $("<span>收货地址："+address+"&nbsp;&nbsp;</span>");
+				div.append(span);
+				span = $("<span>邮编："+shipping.receiverZip+"</span>");
+				div.append(span);
+				
+				$("#order_detail_top").append(div);
+			}
+							
+		</script>
+	</head>
+	<body style="text-align: center;">
+		<span style="font-size: 16px; font-weight: bold; text-align: center;">订单详细</span>
+		<hr />
+		<div id="order_detail_info">
+			<div id="order_detail_top" style="text-align: center;">
+				<div>
+					<span>订单    号：<span id="orderNo"></span></span><br />
+					<span>支付金额：<span id="payment"></span></span><br />
+					<span>支付方式：<span id="payTypeDesc"></span></span><br />
+					<span>邮       费：<span id="postage"></span></span><br />
+					<span>支付状态：<span id="statusDesc"></span></span><br />
+					<span>下单时间：<span id="createTim"></span></span><br />
+					<span>支付时间：<span id="payTime"></span></span><br />
+					<span>发货时间：<span id="sendTime"></span></span><br />
+					<span>收货时间：<span id="endTime"></span></span><br />
+					<span>关闭时间：<span id="closeTim"></span></span><br />
+				</div>
+			</div>
+			<div id="order_detail_centre" style="text-align: center;">
+				<table id="order_item_table" style="text-align: center;margin: 0px auto;" border="1px solid">
+					<tr>
+						<td>编号</td>
+						<td>产品名称</td>
+						<td>产品图片</td>
+						<td>产品单价</td>
+						<td>数量</td>
+						<td>小计</td>
+					</tr>
+				</table>
+			</div>
+			<div id="order_detail_buttom" style="text-align: center;">
+				<a id="to_pay_button" class="no_pay" href="#">付款</a>&nbsp;&nbsp;
+				<a id="cancle_order_button" class="no_pay" href="#" >取消</a>&nbsp;&nbsp;
+				<a id="verify_accepted_button" class="no_received" href="#">确认收货</a>
+			</div>
+		</div>
+	</body>
+</html>

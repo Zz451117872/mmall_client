@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>用户详细信息</title>
+		<script type="text/javascript" src="../../../js/common/jquery-3.1.1.js" ></script>
+		<script type="text/javascript" src="../../../js/manager/user/mmall.js" ></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				var userId = getParams("userId");
+				if(userId != null)
+				{
+					sendRequest("")
+				}
+			});
+						
+			
+			function fillUserToPage(user)
+			{
+				alert("user:"+user.username);
+			}
+		</script>
+	</head>
+	<body>
+		<h3>用户详细信息</h3>
+		<hr />
+		<div>
+			<div></div>
+			<div></div>
+			<div></div>
+		</div>
+	</body>
+</html>

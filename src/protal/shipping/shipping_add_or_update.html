@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script type="text/javascript" src="../../../js/common/jquery.js" ></script>
+		<script type="text/javascript" src="../../../js/common/jquery.validate.js" ></script>
+		<script type="text/javascript" src="../../../js/common/messages_zh.js" ></script>
+		<script src="https://cdn.bootcss.com/distpicker/2.0.1/distpicker.js"></script> 
+		<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				//jquery validate 添加验证方法：验证手机号码
+				jQuery.validator.addMethod("checkPhone",function(value,element){
+					var tel = /^1[34578]\d{9}$/;
+					return tel.test(value);
+				},"请输入正确的手机号");
+				//jquery validate 添加验证方法：验证电话号码
+				jQuery.validator.addMethod("checkMobile",function(value,element){
+					var tel = /^[0-9]{4}-[0-9]{7}$/;
+					return tel.test(value);
+				},"请输入正确的座机号");
+				//jquery validate 添加验证方法：验证邮编
+				jQuery.validator.addMethod("checkZip",function(value,element){
+					var tel = /^[0-9]{6}$/;
+					return tel.test(value);
+				},"请填写正确的6位邮政编码");
+				
+				//jquery validate插件获取验证器对象
+				var validater = $("#address_add_or_update_form").validate({
+					onfocusout: function(element) { $(element).valid(); },
+					rules:{
+						receiverAddress:{
+							required:true
+						},
+						receiverZip:{
+							required:true,
+							checkZip:true
+						},
+						receiverName:{
+							required:true,
+							minlength:3,
+							maxlength:10
+						},
+						receiverPhone:{
+							required:true,
+							checkPhone:true
+						},
+						receiverMobile:{
+							required:true,
+							checkMobile:true
+						},
+						receiverProvince:{
+							required:true
+						},
+						receiverCity:{
+							required:true
+						},
+						receiverDistrict:{
+							required:true
+						}
+					}
+				});
+				//获取传入页面的 收货地址id，并拉取地址信息		
+				var shippingId = getParams("shippingId");
+				var url = getParams("url"); // 在添加地址或者 修改地址成功后，需要跳转到哪个页面
+				if(shippingId != null)
+				{
+					sendRequest("shipping/shipping.do",{"shippingId":shippingId},fillShippingToPage);
+				}else{
+					$("#roughly_address").distpicker();	//jquery distpicker 插件，用于生成中国 省 市 县 三级地址联动信息
+				}
+				//给地址修改或者添加地址 按钮添加点击事件
+				$("#address_add_or_update_button").click(function(){
+					if(validater.form()){
+						var data = getFormData("address_add_or_update_form");
+						url = url == null ? "shipping_list.html": url;
+						sendRequest("shipping/add_or_update_shipping.do",data,url);
+					}
+					return false;
+				});
+			});
+			//填充地址信息到页面												
+			function fillShippingToPage(shipping)
+			{
+				$("#id").val(shipping.id);
+				$("#receiverName").val(shipping.receiverName);
+				$("#receiverPhone").val(shipping.receiverPhone);
+				$("#receiverMobile").val(shipping.receiverMobile);				
+				$("#receiverAddress").val(shipping.receiverAddress);				
+				$("#receiverZip").val(shipping.receiverZip);
+				
+				$("#roughly_address").distpicker(
+					{
+						 province: shipping.receiverProvince,
+						  city: shipping.receiverCity,
+						  district: shipping.receiverDistrict
+					}
+				);				
+			}
+		</script>
+	</head>
+	<body>		
+		<h3 style="text-align: center;">新增，修改地址</h3>
+		<hr />
+		<div style="height: 200px;width: 800px;border: 1px solid;margin: 0px auto;">
+			<form id="address_add_or_update_form" method="post" action="">
+				<input id="id" type="hidden" name="id" />
+							
+				<div id="roughly_address">  
+				  <select name="receiverProvince"></select>  
+				  <select name="receiverCity"></select>  
+				  <select name="receiverDistrict"></select>  
+				</div> 
+				村/镇/街：<input type="text" name="receiverAddress" id="receiverAddress" /><br />
+				邮 &nbsp;&nbsp;&nbsp;&nbsp; 编：<input type="text" name="receiverZip" id="receiverZip" /><br />
+				收 &nbsp;货&nbsp;人：<input type="text" name="receiverName" id="receiverName" /><br />
+				手 &nbsp;&nbsp;&nbsp;&nbsp; 机：<input type="text" name="receiverPhone" id="receiverPhone" /><br />
+				电 &nbsp;&nbsp;&nbsp;&nbsp; 话：<input type="text" name="receiverMobile" id="receiverMobile" /><br />						
+				<div style="margin: 0px 100px 0px;">
+					<input id="address_add_or_update_button" type="submit" value="提交" />
+				</div>
+			</form>
+		</div>
+		
+	</body>
+</html>

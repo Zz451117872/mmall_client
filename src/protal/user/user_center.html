@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>用户管理中心</title>
+		<script type="text/javascript" src="../../../js/common/jquery.js" ></script>
+		<script type="text/javascript" src="../../../js/common/jquery.validate.js" ></script>
+		<script type="text/javascript" src="../../../js/common/messages_zh.js" ></script>
+		<script type="text/javascript" src="../../../js/common/jquery.cookie.js" ></script>
+		<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+		<script type="text/javascript" src="../../../js/common/rules.js" ></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+			
+			$("#update_user_submit").hide();
+			//获取 username cookie,并拉取用户信息
+			var username = $.cookie("mmall_username");
+			
+			if(username != null && username!= "")
+			{
+				sendRequest("user/get_information.do",{"username":username},fillUserToPage);
+			}
+			
+			var validater = null;
+			//给编辑用户按钮 添加单击事件
+			$("#edit_user").click(function(){
+				if($(this).text() == "编辑")
+				{										
+					var parent = $("#user_infor");
+					replacement(parent,"span","input");
+						//jquery.validate 插件获取验证器对象
+						validater = $("#update_user_form").validate({
+						onfocusout: function(element) { $(element).valid(); },
+						rules:{
+							question:{
+								required:true
+							},
+							answer:{
+								required:true
+							}
+						}
+					});
+					
+					$("#username").rules("add",usernameRules);
+					$("#email").rules("add",emailRules);
+					$("#phone").rules("add",phoneRules);
+					
+					$(this).text("更新");
+				}else{
+					if(validater != null && validater.form()){
+						updateUser();
+					}					
+				}
+			});
+						
+			$("#update_password").click(function(){
+				location.href = "update_password.html";
+			});
+		});
+		//更新用户函数
+		function updateUser()
+		{
+			var x = $("#update_user_form").serializeArray();
+			var data = {};  
+			$.each(x, function(i, field){  		
+				data[field.name] = field.value;
+			}); 
+			sendRequest("user/update_information.do",data,null);
+			return false;
+		}
+		//替换元素函数	
+		function replacement(parent,ele_replaced,ele_replace)
+		{
+			$(parent).find(ele_replaced).each(function(){
+				var id = $(this).attr("id");
+				id = id.substring(0,id.indexOf("_"));
+				var obj = $("<"+ele_replace+" />");
+				$(obj).attr("name",id);
+				$(obj).attr("id",id);
+				$(obj).attr("type","text");
+				$(obj).val($(this).text());
+				$(this).text("");
+				$(this).append(obj);
+			});
+		}
+		//填充用户信息到页面
+		function fillUserToPage(user)
+		{
+			$("#id").val(user.id);
+			$("#username_span").text(user.username);
+			$("#email_span").text(user.email);
+			$("#phone_span").text(user.phone);
+			$("#question_span").text(user.question);
+			$("#answer_span").text(user.answer);
+		}
+				
+		</script>
+	</head>
+	<body>
+		<div style="width: 600px; height: 400px;margin: 0px auto;">
+			<div style="text-align: center;">
+				<span style="font-size: 16px; font-weight: bold;text-align: center;">基本信息</span>
+			</div>
+			<hr />
+			<div id="user_infor" style="text-align: left;">
+				<form id="update_user_form" method="post">
+					<input id="id" name="id" type="hidden" />
+					用户名：<span id="username_span"></span><br>
+					邮   箱：<span id="email_span"></span><br>
+					手   机：<span id="phone_span"></span><br>
+					密保问题：<span id="question_span"></span><br>
+					密保答案：<span id="answer_span"></span><br>
+				</form>
+			</div>
+			<div id="user_operate" style="text-align: left;">
+				<hr />
+				<a id="edit_user" href="#">编辑</a>&nbsp;&nbsp;
+				<a id="update_password" href="#">修改密码</a>&nbsp;&nbsp;
+				<hr />
+			</div>
+		</div>
+	</body>
+</html>

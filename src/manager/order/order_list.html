@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!--
+        	作者：451117872@qq.com
+        	时间：2018-02-27
+        	描述：订单管理
+        -->
+		<meta charset="UTF-8">
+		<title>订单管理</title>
+		<script type="text/javascript" src="../../../js/common/jquery.js" ></script>
+		<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+		<script type="text/javascript" src="../../../js/common/common.js" ></script>
+		<style type="text/css">
+			.tr_selected_status{
+				background-color: #777620;
+			}
+		</style>
+		<script type="text/javascript" src="../../../js/manager/order/order_list.js" ></script>
+	</head>
+	<body>
+		<h3 style="text-align: center;">订单信息管理</h3>
+		<input id="currentOrderNo" type="text" />
+		<hr />
+		<div id="order_info" style="border: 1px solid;">
+			<div id="order_top" style="text-align: center;">
+				<span><input class="input_class" type="text" id="orderNo" value="按订单号查询" />
+						<button id="by_order_no">GO</button></span><br />
+				<span></span><input class="input_class" type="text" id="username" value="按用户查询" />
+						<button id="by_username">GO</button></span><br />
+				<span><select style="width: 216px;text-align: center;" id="order_crate_time">
+						<option value="0">距下单时间</option>
+						<option value="5">最近5分钟</option>
+						<option value="30">最近30分钟</option>
+						<option value="60">最近1小时</option>
+						<option value="360">最近6小时</option>
+						<option value="720">最近12小时</option>
+						<option value="1440">最近1天</option>
+					</select></span>
+				<span><select  style="width: 216px;text-align: center;" id="order_status">
+					<option value="">订单状态</option>
+					<option value="0">未付款</option>
+					<option value="2">未发货</option>
+					<option value="3">未收货</option>
+					<option value="4">未关闭</option>
+					<option value="1">已取消</option>
+					<option value="5">已关闭</option>
+				</select></span><br>
+				<a id="check_order_detail_button" href="#">查看详细</a>&nbsp;&nbsp;
+				<a class="payed_class" id="send_goods_button" href="#">发货</a>&nbsp;&nbsp;
+				<a class="received_class" id="close_order_button" href="#">关闭订单</a>
+			</div>
+			<div id="order_centre">
+				<table style="margin: 0px auto;" id="order_table" border="1px solid">
+					<tr>
+						<td>订单号</td>
+						<td>用户</td>
+						<td>总金额</td>
+						<td>支付方式</td>
+						<td>邮费</td>
+						<td>状态</td>	
+						<td>下单时间</td>
+						<td>支付时间</td>
+						<td>发货时间</td>
+						<td>收货时间</td>
+						<td>关闭时间</td>						
+					</tr>
+				</table>
+			</div>
+			<div id="order_bottom" style="text-align: center;">
+				<iframe id="pageIframeId" name="pageIframe" src="/mmall/src/common/page.html" scrolling="no" width="500px" height="40px" frameborder="0"></iframe>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>用户管理页面</title>
+		<script type="text/javascript" src="../../../js/common/jquery.js" ></script>
+		<script type="text/javascript" src="../../../js/common/common.js" ></script>
+		<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+		<style type="text/css">
+			.tr_selected_status{
+				background-color: #454545;
+			}
+		</style>
+		<script type="text/javascript">
+			$(document).ready(function(){	
+				//根据默认信息拉取用户集合信息
+				loadUsersByUsernamdAndRole();
+				//对按用户名查找用户按钮添加点击事件
+				$("#by_username_button").click(loadUsersByUsernamdAndRole);
+				//对用户角色select添加改变事件
+				$("#user_role").change(loadUsersByUsernamdAndRole);
+				
+				//input类型按钮 获取焦点时清空数据
+				$("input").focus(function(){
+					$(this).val("");
+				});
+				//对用户table的每一行tr 添加委托事件
+				$("#user_table").delegate("tr:not(:first)","click",function(){
+					var userId = $(this).attr("name");
+					var status = $("#"+"status"+userId+"").text();
+					if(status != "已冻结")
+					{
+						$("#freeze_user_button").text("冻结");
+					}else{
+						$("#freeze_user_button").text("解冻");
+					}
+					$("#user_table tr[name != "+userId+"]").removeClass("tr_selected_status");
+					$(this).toggleClass("tr_selected_status");
+					if($("#userId").val() == userId)
+					{
+						$("#userId").val("");
+					}else{
+						$("#userId").val(userId);
+					}
+				});
+			
+				//对冻结用户按钮添加点击事件
+				$("#freeze_user_button").click(function(){
+					var userId = $("#userId").val();
+					if(userId != null && userId != "")
+					{
+						sendRequest("manager_user/freeze_user.do",{"userId":userId},freezeUserFallback);
+					}else{
+						alert("请选择用户");
+					}
+				});
+				//对重置密码按钮添加点击事件
+				$("#reset_pwd_button").click(function(){
+					var userId = $("#userId").val();
+					if(userId != null && userId != "")
+					{
+						sendRequest("manager_user/reset_password.do",{"userId":userId},resetPasswordFallback);
+					}else{
+						alert("请选择用户");
+					}
+				});
+			});
+			//通过用户名关键字 和 用户角色 拉取用户集合信息
+			function loadUsersByUsernamdAndRole()
+			{
+				var userRole = $("#user_role").val();				
+				var username = $("#username").val();
+				if(username == "" || username == "通过用户名查找")
+				{
+					username = null;
+				}
+				sendRequest("manager_user/get_all_user.do",
+								{
+									"username":username,
+									"userRole":userRole,
+									"pageNum":1,
+									"pageSize":10
+								},
+								fillUsersToPage);
+			}
+			//填充用户信息到页面
+			function fillUsersToPage(data)
+			{
+				var users = data.list;
+				$(".new_add_user").remove();
+				if(users != null)
+				{								
+					for(var i=0; i<users.length; i++)
+					{
+						fillUserToPage(users[i]);
+					}
+				}
+			}
+			
+			function fillUserToPage(user)
+			{
+				var tr = $("<tr name='"+user.id+"' class='new_add_user'></tr>");				
+				var td = $("<td>"+user.id+"</td>");
+				tr.append(td);
+				td = $("<td>"+user.username+"</td>");
+				tr.append(td);
+				td = $("<td>"+user.email+"</td>");
+				tr.append(td);
+				td = $("<td>"+user.phone+"</td>");
+				tr.append(td);
+				td = $("<td>"+user.roleName+"</td>");
+				tr.append(td);
+				td = $("<td>"+user.createTime+"</td>");
+				tr.append(td);
+				td = $("<td>"+user.updateTime+"</td>");
+				tr.append(td);
+				td = $("<td id='"+"status"+user.id+"'>"+user.statusDesc+"</td>");
+				tr.append(td);				
+				$("#user_table").append(tr);
+			}
+			//冻结用户回调函数
+			function freezeUserFallback(data)
+			{			
+				var userId = $("#userId").val();
+				var status = $("#"+"status"+userId+"").text();
+				if(status == "已冻结")
+				{
+					$("#"+"status"+userId+"").text("正常")
+					$("#freeze_user_button").text("冻结");
+				}else{
+					$("#"+"status"+userId+"").text("已冻结");
+					$("#freeze_user_button").text("解冻");
+				}												
+			}
+			//重置密码回调函数
+			function resetPasswordFallback(data)
+			{
+				alert("重置成功");
+			}
+			
+		</script>
+	</head>
+	<body>
+		<h3 style="text-align: center;">用户信息管理</h3>
+		<input type="hidden" id="userId" />
+		<hr />
+		<div style="text-align: center;font-size: 14px;">
+			<span><input type="text" id="username" value="通过用户名查找" />
+					<button id="by_username_button">GO</button><br></span>
+			选择用户类型：<select id="user_role">
+				<option value="0">普通用户</option>
+				<option value="1">管理员</option>
+			</select>
+		</div>
+		<div id="user_info" style="border: 1px solid;">
+			<div id="user_top" style="text-align: center;">
+				<a id="freeze_user_button" href="#">冻结</a>&nbsp;&nbsp;
+				<a id="reset_pwd_button" href="#">重置密码</a>
+			</div>
+			<div id="user_centre">
+				<table style="margin: 0px auto;" id="user_table" border="1px solid">
+					<tr>
+						<td>id</td>
+						<td>用户名</td>
+						<td>邮箱</td>
+						<td>手机</td>
+						<td>角色</td>
+						<td>注册时间</td>
+						<td>更新时间</td>
+						<td>状态</td>
+					</tr>
+				</table>
+			</div>
+			<div id="user_bottom" style="text-align: center;">
+				<iframe id="pageIframeId" name="pageIframe" src="/mmall/src/common/page.html" scrolling="no" width="500px" height="40px" frameborder="0"></iframe>
+			</div>
+		</div>
+	</body>
+</html>

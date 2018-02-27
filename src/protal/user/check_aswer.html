@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script type="text/javascript" src="../../../js/common/jquery.js" ></script>
+		<script type="text/javascript" src="../../../js/common/jquery.validate.js" ></script>
+		<script type="text/javascript" src="../../../js/common/messages_zh.js" ></script>
+		<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+		<script type="text/javascript" src="../../../js/common/rules.js" ></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				//将 密码提示问题 区域隐藏
+				$(".password_hint_question").hide();
+				//将 重置密码区域隐藏
+				$(".reset_password").hide();
+				
+				var validater = getValidater("check_answer_form");
+				//给username输入框添加“必须”规则
+				$("#username").rules("add",{required:true});
+				//给answer输入框添加“必须”规则
+				$("#answer").rules("add",{required:true});
+				
+				//给 获取密码提示问题 按钮 添加单击事件
+				$("#get_password_hint_question").click(function(){
+					var username = $("#username").val();
+					if(username != null && username != "")
+					{
+						sendRequest("user/forget_get_question.do",{"username":username},getPasswordHintQuestionFallback)
+					}else{
+						alert("请填写用户名");
+					}
+					return false;
+				});
+				//给 检查密码提示问题答案 按钮 添加点击事件
+				$("#check_answer_button").click(function(){
+					var data = getFormData("check_answer_form");
+					sendRequest("user/forget_check_answer.do",data,checkAnswerFallback);
+				});
+				//给 忘记密码重置密码 按钮添加单击事件
+				$("#forget_reset_password_button").click(function(){
+					var data = getFormData("forget_reset_password_form");
+					data.username = $("#username").val();
+					sendRequest("user/forget_reset_password.do",data,"../../common/login.html");
+				});
+			})
+			
+			//检查 密码提示问题答案 回调函数
+			function checkAnswerFallback(token)
+			{
+				$("#forgetToken").val(token);
+				$(".reset_password").show();
+			}
+			//获取 密码提示问题 回调函数
+			function getPasswordHintQuestionFallback(question)
+			{
+				$("#question").val(question);
+				$(".password_hint_question").show();
+			}
+		</script>
+	</head>
+	<body>
+		<div>
+			<div style="width: 400px;height: 200px;margin: 0px auto;text-align: center;">
+				<span style="font-size: 16px;font-weight: bold;">密码问题验证</span>
+				<hr />
+				<form id="check_answer_form" method="post" action="" style="text-align: left;">
+					<span>用户名：<input id="username" type="text" name="username" />
+						<button id="get_password_hint_question">获取提示问题</button><br></span>
+					<span class="password_hint_question">问 &nbsp;&nbsp;题：
+						<input id="question" name="question" /><br></span>
+					<span class="password_hint_question">答  &nbsp;&nbsp;案：
+						<input name="answer" id="answer" /><br></span>
+				</form>
+				<hr />
+				<button class="password_hint_question" id="check_answer_button">提交</button>
+			</div>
+			<div class="reset_password" style="width: 400px;height: 200px;margin: 0px auto;text-align: center;">
+				<hr />
+				<form id="forget_reset_password_form" method="post" action="" style="text-align: left;">
+					<input name="token" id="forgetToken" value="" type="hidden" />
+					<span class="reset_password">新密码:<input name="passwordNew" id="passordNew" type="text" /><br /></span>
+				</form>
+				<hr />
+				<button class="reset_password" id="forget_reset_password_button">重置</button>
+			</div>
+		</div>
+	</body>
+</html>

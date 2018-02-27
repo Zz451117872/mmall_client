@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script type="text/javascript" src="../../../js/common/jquery.js" ></script>
+		<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+		<style type="text/css">
+			.tr_selected_status{
+				background-color: #919191;
+			}
+		</style>
+		<script type="text/javascript" src="../../../js/client/cart/cart_list.js" ></script>
+	</head>
+	<body>
+		<h3 style="text-align: center;">我的购物 车</h3>
+		<hr />
+		<div id="cart_info" style="text-align: center;">
+			<div>
+				<a href="#" onclick="deleteCart();">删除选中</a>
+				<span>共<span id="cartTotalQuantity">0</span>件</span>
+				<span>价值￥<span id="cartTotalPrice">0</span>元</span><br />
+			</div>
+			<div id="cart_list">
+				<table style="margin: 0px auto;" id="cart_item_table" border="1px solid">
+					<tr>
+						<td><input checked="checked" id="select_all" type="checkbox" /></td>
+						<td>id</td>
+						<td>名称</td>
+						<td>小标题</td>
+						<td>主图</td>
+						<td>价格</td>
+						<td>数量</td>
+						<td>库存</td>
+						<td>小计</td>
+						<td>下单时间</td>
+					</tr>
+				</table>
+			</div>
+			<div>				
+				<div style="text-align: center;">
+					<span>共<span id="currentTotalQuantity">0</span>件</span>
+					<span>花费￥<span id="currentTotalPrice">0</span>元</span><br />
+					<span><a href="#" onclick="prepareOrder();">结算</a></span>
+				</div>				
+			</div>
+		</div>
+	
+	</body>
+</html>

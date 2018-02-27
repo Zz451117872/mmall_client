@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script type="text/javascript" src="../../../js/common/jquery.js" ></script>
+		<style type="text/css">
+			#product_detail_info{
+				width: 600px;
+				height: 350px;
+				border: 1px solid;
+				margin: 0px auto;
+				text-align: center;
+			}
+			#product_detail_left{
+				width: 250px;
+				height: 200px;
+				float: left;
+			}
+			#product_detail_right{
+				width: 350px;
+				height: 250px;
+				text-align: left;
+				float: left;
+			}
+		</style>
+		<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				//获取传入页面的产品id参数， 并拉取产品 信息
+				var productId = getParams("productId");				
+				if(productId != null)
+				{
+					sendRequest("product/detail.do",{"productId":productId},fillProductToPage);
+				}
+				//给 加入购物车按钮 添加点击事件
+				$("#add_cart_button").click(function(){
+					var quantity = $("#quantity").val();
+					if(productId != null && quantity != null && quantity != "")
+					{
+						sendRequest("cart/add_cart.do",{"productId":productId,"quantity":quantity},"../cart/cart_list.html")
+					}else{
+						alert("参数缺失")
+					}
+				});
+				//给 减少购买数量按钮 添加点击事件
+				$("#dis_quantity_button").click(function(){
+					var quantity = $("#quantity").val();
+					if(gt(quantity,1))
+					{
+						$("#quantity").val(dis(quantity,1));
+					}
+					if(eq(dis(quantity,1),1))
+					{
+						$(this).attr("disabled","disabled");
+					}
+					
+					if($("#add_quantity_button").attr("disabled") == "disabled")
+					{
+						$("#add_quantity_button").attr("disabled",false);
+					}
+					
+				});
+				//给 增加购买数量按钮 添加点击事件
+				$("#add_quantity_button").click(function(){
+					var quantity = $("#quantity").val();
+					var stock = $("#stock").text();
+					if(lt(quantity,stock))
+					{
+						$("#quantity").val(add(quantity,1));
+					}
+					if(eq(add(quantity,1),stock))
+					{
+						$(this).attr("disabled","disabled");
+					}
+					
+					if($("#dis_quantity_button").attr("disabled") == "disabled")
+					{
+						$("#dis_quantity_button").attr("disabled",false);
+					}
+				});
+				//给输入框添加获取焦点事件
+				$("#quantity").focus(function(){
+					$(this).val("");
+				});
+				//给输入框添加失去焦点事件
+				$("#quantity").blur(function(){
+					var quantity = $("#quantity").val();
+					var stock = $("#stock").text();
+					
+					if(gt(quantity,stock))
+					{
+						quantity = stock;
+						$("#add_quantity_button").attr("disabled","disabled");
+					}else if(lt(quantity,1))
+					{
+						quantity = 1;
+						$("#dis_quantity_button").attr("disabled","disabled");
+					}
+					$("#quantity").val(quantity);
+				});
+			});
+			//填充产品信息到页面
+			function fillProductToPage(product)
+			{
+				for(var attribute in product)
+				{
+					$("#"+attribute+"").text(product[attribute]);
+				}
+				$("#mainImage").attr("src",product.mainImage);
+			}
+		</script>
+	</head>
+	<body style="text-align: center;">
+		<h3>产品详细</h3>
+		<hr />
+		<div id="product_detail_info" >
+			<div id="product_detail_top">
+				<span>产品ID：<span id="id"></span></span><br />
+				<span>产品分类：<span id="categoryName"> </span></span><br />
+				<span>产品标题：<span id="name"></span></span><br />
+				<span>产品标题：<span id="subtitle"></span></span>
+			</div>
+			<div id="product_detail_bottom">
+				<div id="product_detail_left">
+					<img id="mainImage" src="" /><br />
+				</div>
+				<div id="product_detail_right">
+					<span>产品详细：<span id="detail"></span></span><br />
+					<span>产品价格：<span id="price"></span></span><br />
+					<span>产品库存：<span id="stock"></span></span><br />
+					<span>产品状态：<span id="status"></span></span><br />
+					<span>上架时间：<span id="createTime"></span></span><br />
+					<span>
+						<button style="width: 30px;" disabled="disabled" id="dis_quantity_button">-</button>
+						<input id="quantity" style="width: 25px;" type="text" value="1" />
+						<button style="width: 30px;" id="add_quantity_button">+</button>
+						<button  id="add_cart_button">购买</button>
+					</span>
+				</div>
+			</div>
+									
+		</div>
+	</body>
+</html>

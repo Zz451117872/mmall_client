@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>mmall-online</title>
+		<link rel="stylesheet" href="css/index.css" />
+		<style type="text/css">
+			.div1{
+				width: 1800px;
+				height: 250px;
+				margin: 10px;
+			}
+			.div2{
+				width: 220px;
+				height: 200px;
+				float: left;
+				border: 1px dotted;
+				margin: 10px;
+				padding: 5px;
+			}
+			.span{
+				display: block;
+			}
+			.span2{
+				font-size: 18px;
+				font-weight: bold;
+			}	
+			.img{
+				width: 150px;
+				height: 80px;
+			}
+		</style>
+		<script type="text/javascript" src="js/common/jquery.js" ></script>
+		<script type="text/javascript" src="js/common/jquery.cookie.js"></script>
+		<script type="text/javascript" src="js/common/common.js" ></script>
+		<script type="text/javascript" src="js/common/mmall.js" ></script>
+		<script type="text/javascript" src="js/client/index.js" ></script>
+	</head>
+	<body style="height: 100%; width: 100%; ">
+		<div id="client_top" style="height: 20%; width: 100%;background-color: #B7D2FF;">
+			<h2 style="text-align: center;">欢迎光临mmall网上商城</h2>
+			<p style="text-align: center;">
+				<input style="width: 200px; height: 30px; font-size: 18px;" id="keyword" value="请输入商品名称"></input>
+				<a href="src/srprotal/product/product_list.html" id="search" target="info_show">搜索</a>
+			</p>
+			
+			<span class="is_login" id="welcome"></span>&nbsp;
+			
+			<a href="src/manager/manager.html">去后台</a>&nbsp;
+			
+			<span class="is_nologin">
+				<a href="src/common/login.html" id="login" target="info_show">登录</a> &nbsp;
+			</span>
+			<span class="is_nologin">
+				<a href="src/protal/user/register.html" id="register" target="info_show">注册</a>&nbsp;
+			</span>
+			<span class="is_login">
+				<a href="src/protal/user/user_center.html" id="userCenter" target="info_show">用户中心</a>&nbsp;
+			</span>
+			<span class="is_login">
+				<a href="src/protal/cart/cart_list.html" id="mycarts" target="info_show">我的购物车</a>&nbsp;
+			</span>
+			<span class="is_login">
+				<a href="src/protal/order/order_list.html" id="myorders" target="info_show">我的订单</a>&nbsp;
+			</span>
+			<span class="is_login">
+				<a href="src/protal/shipping/shipping_list.html" id="shipping_address" target="info_show">收货地址</a>&nbsp;
+			</span>
+			<span class="is_login">
+				<a href="#" id="quit_button">退出</a>
+			</span>
+			<br />
+		</div>
+		<div id="client_centre" style="height: 700px; width: 100%; background-color: #E9E9E9;">
+			<div id="product_category" style="height: 100%; width: 20%; background-color:#E0ECFF; float: left;">
+				
+			</div>
+			<div style="height: 700px; width: 80%; float: left;">
+				<iframe name="info_show" style="height: 100%; width: 100%;"></iframe>
+			</div>			
+		</div>
+		<div id="client_bottom" style="height: 50px; width: 100%; background-color: ##000000;">
+			<h3 style="text-align: center;">版权所有，侵权不究</h2>
+		</div>
+	</body>
+</html>

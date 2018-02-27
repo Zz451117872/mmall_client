@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>支付二维码</title>
+		<script type="text/javascript" src="../../../js/common/jquery.js" ></script>
+		<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				//获取传入页面的 订单号 与 支付二维码的url
+				var orderNo = getParams("orderNo");
+				var qrUrl = getParams("qrUrl");
+				
+				$("#orderNo").text(orderNo);
+				$("#qrUrl").attr("src",qrUrl);
+				//定时器 检查订单状态是否已支付
+				window.setInterval(checkPayStatus,1000);
+			});
+			//检查支付状态函数
+			function checkPayStatus()
+			{
+				var orderNo = $("#orderNo").text();
+				if(orderNo == null || orderNo == "")
+				{
+					alert("没有订单");
+				}
+				
+				
+				$.ajax({
+					'url':url_prefix+"order/isPayed.do",
+					type:"POST",
+					xhrFields:{
+						withCredentials:true
+					},
+					dataType:"json",
+					data:{
+						"orderNo":orderNo
+					},
+					success:function(result){
+						if(result.status == 1)
+						{									
+							location.href = "../order/order_detail.html?orderNo="+orderNo;
+						}
+					}
+				})												
+							
+			}
+				
+			
+		</script>
+	</head>
+	<body>
+		<h3 style="text-align: center;">快点给钱</h3>
+		<hr />
+		<p style="text-align: center;">订单号：<span id="orderNo"></span></p>
+		<hr />
+		<div style="text-align: center;">
+			<img id="qrUrl" src="" />
+		</div>
+	</body>
+</html>

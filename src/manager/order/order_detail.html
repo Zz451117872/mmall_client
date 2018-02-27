@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>订单详细</title>
+		<script type="text/javascript" src="../../../js/common/jquery.js" ></script>
+		<style type="text/css">
+			.tr_selected_status{
+				background-color: #00FFFF;
+			}
+		</style>
+		<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				//获取传入页面的 订单号 参数
+				var orderNo = getParams("orderNo");
+				//拉取订单信息
+				if(orderNo != null)
+				{
+					sendRequest("manager_order/order_detail.do",{"orderNo":orderNo},loadOrderFallback);
+				}
+				//对订单table的每一行tr添加委托事件
+				$("#order_item_table").delegate("tr:not(:first)","click",function(){
+					var orderItmeId = $(this).attr("name");
+					$("#order_item_table tr[name != "+orderItmeId+"]").removeClass("tr_selected_status");
+					$(this).toggleClass("tr_selected_status");					
+				});
+				//对发货按钮添加点击事件
+				$("#send_goods_button").click(function(){
+					var orderNo = $("#orderNo").text();
+					if(orderNo != null && orderNo != "")
+					{
+						sendRequest("manager_order/send_goods.do",{"orderNo":orderNo},sendGoodsFallback);
+					}else{
+						alert("没有订单");
+					}
+				});
+				//对关闭订单按钮添加点击事件
+				$("#close_order_button").click(function(){
+					var orderNo = $("#orderNo").text();
+					if(orderNo != null && orderNo != "")
+					{
+						sendRequest("manager_order/close_order.do",{"orderNo":orderNo},closeOrderFallback);
+					}else{
+						alert("没有订单");
+					}
+				});
+			});
+			//关闭订单回调函数
+			function closeOrderFallback()
+			{
+				$(".payed_class").each(function(){
+					$(this).hide();
+				});				
+				$("#statusDesc").text("已发货");		
+				$("#sendTime").text(getCurrentTime());	
+			}
+			//发货回调函数	
+			function sendGoodsFallback()
+			{
+				$(".receivered_class").each(function(){
+					$(this).hide();
+				});				
+				$("#statusDesc").text("已关闭");		
+				$("#closeTim").text(getCurrentTime());				
+			}
+			//加载订单回调函数						
+			function loadOrderFallback(order)
+			{
+				initPage(order.status);
+				for(var prop in order)
+				{
+					if(order.hasOwnProperty(prop))
+					{
+						$("#"+prop+"").text(order[prop]);
+					}
+				}
+				var shipping = order.shippingVO;
+				for(var prop in shipping)
+				{
+					if(shipping.hasOwnProperty(prop))
+					{
+						$("#"+prop+"").text(shipping[prop]);
+					}
+				}
+				var orderItems = order.orderItemVOList;
+				if(orderItems != null)
+				{				
+					var parent = $("#order_item_table");
+					for(var i=0; i<orderItems.length; i++)
+					{
+						var data = getData(orderItems[i],"id,productName,productImage,currentUnitPrice,quantity,totalPrice");
+						fillDataToTable(data,parent);
+					}
+				}
+			}
+			//在不同的订单状态下显示不同的操作按钮							
+			function initPage(status)
+			{
+				if(status == 2)
+				{
+					$(".payed_class").show();
+					$(".receivered_class").hide();
+				}else if(status == 4){
+					$(".receivered_class").show();
+					$(".payed_class").hide();
+				}else{
+					$(".payed_class").hide();
+					$(".receivered_class").hide();
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<h3 style="text-align: center;">订单详细</h3>
+		<hr />
+		<div id="order_detail_info" >
+			<div id="order_detail_top" style="text-align: center;">
+				<div id="order_info">
+					<span>订单号：<span id="id"></span><br></span>
+					<span>总金额：<span id="payment"></span><br></span>
+					<span>支付方式：<span id="payTypeDesc"></span><br></span>
+					<span>邮费：<span id="postage"></span><br></span>
+					<span>订单状态：<span id="statusDesc"></span><br></span>
+					<span>下单时间：<span id="createTim"></span><br></span>
+					<span>支付时间：<span id="payTime"></span><br></span>
+					<span>发货时间：<span id="sendTime"></span><br></span>
+					<span>收货时间：<span id="endTime"></span><br></span>
+					<span>关闭时间：<span id="closeTim"></span><br></span>	
+				</div>
+				<div id="address_info">
+					<span>收货人：<span id="receiverName"></span><br></span>
+					<span>收货人手机：<span id="receiverPhone"></span><br></span>
+					<span>收货地址：<span id="reciverAddress"></span><br></span>
+					<span>收货人电话：<span id="receiverMobile"></span><br></span>
+				</div>
+			</div>	
+			<div style="text-align: center;" >
+				<a id="send_goods_button" class="payed_class"  href="#">发货</a>&nbsp;&nbsp;
+				<a id="close_order_button" class="receivered_class" href="#">关闭订单</a>&nbsp;&nbsp;
+			</div>
+			<div id="order_detail_centre">
+				<table style="margin: 0px auto;" id="order_item_table" border="1px solid">
+					<tr>
+						<td>编号</td>
+						<td>产品名称</td>
+						<td>产品图片</td>
+						<td>产品单价</td>
+						<td>数量</td>
+						<td>小计</td>
+					</tr>
+				</table>
+			</div>
+			
+		</div>
+	</body>
+</html>

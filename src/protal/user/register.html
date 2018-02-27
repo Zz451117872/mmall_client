@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script type="text/javascript" src="../../../js/common/jquery.js" ></script>
+		<script type="text/javascript" src="../../../js/common/jquery.validate.js" ></script>
+		<script type="text/javascript" src="../../../js/common/messages_zh.js" ></script>
+		<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+		<script type="text/javascript">
+			$(document).ready(function(){	
+				
+				var remoteUrl =url_prefix+ "user/check_valid.do";
+				//jquery validate插件 添加方法: 验证手机号码
+				jQuery.validator.addMethod("checkPhone",function(value,element){
+					var tel = /^1[34578]\d{9}$/;
+					return tel.test(value);
+				},"请输入正确的手机号");
+				//jquery validate插件获取验证器对象							
+				var validater = $("#register_form").validate({
+					onfocusout: function(element) { $(element).valid(); }, //这句很重要					
+						rules:{
+							username:{
+								required:true,
+								minlength:3,
+								maxlength:10,
+								remote:{
+									url:remoteUrl,
+									type:"post",
+									dataType:"json",
+									data:{
+										name:"username",
+										value:function(){
+											return $("#username").val();
+										}
+									}
+								}
+							},
+							password:{
+								required:true,
+								minlength:3,
+								maxlength:10
+							},
+							email:{		
+								required:true,
+								email:true,
+								remote:{
+									url:remoteUrl,
+									type:"post",
+									dataType:"json",
+									data:{
+										name:function(){
+											return $("#email").attr("name");
+										},
+										value:function(){
+											return $("#email").val();
+										}
+									}
+								}
+							},
+							phone:{
+								required:true,
+								checkPhone:true
+							},
+							question:{
+								required:true
+							},
+							answer:{
+								required:true
+							}
+						}
+					});
+				
+				//给注册按钮 添加单击事件
+				$("#register_button").click(function(){
+					if(validater.form()){					
+						var data = getFormData("register_form");
+						sendRequest("user/add_or_update_user.do",data,"../../common/login.html");
+					}		
+					return false;
+				});
+				//给重置按钮添加单击事件																
+				$("#reset_button").click(function(){					
+					validater.resetForm();
+					$("input[type = text]").val("");
+					return false;
+				});
+			});					
+		</script>
+	</head>
+	<body>
+		<div style="width: 600px; height: 400px;margin: 0px auto;text-align: left;">
+			<h3>用户注册</h3>
+			<hr />
+				<form id="register_form" method="post" action="" style="text-align: left;">
+					用户名：<input id="username" name="username" type="text" /><br />
+					密  &nbsp;&nbsp;码：<input id="password" name="password" type="text" /><br />
+					邮  &nbsp;&nbsp;箱：<input id="email" name="email" type="text" /><br />
+					电  &nbsp;&nbsp;话：<input id="phone" name="phone" type="text" /><br />
+					问  &nbsp;&nbsp;题：<input id="question" name="question" type="text" /><br />
+					答  &nbsp;&nbsp;案：<input id="answer" name="answer" type="text" /><br />
+					<input type="submit" id="register_button" value="注册" />&nbsp;&nbsp;
+					<input type="reset" id="reset_button" value="重置" />
+				</form>				
+			<hr />
+		</div>
+	</body>
+</html>

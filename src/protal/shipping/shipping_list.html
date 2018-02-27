@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>收货地址管理</title>
+		<script type="text/javascript" src="../../../js/common/jquery.js" ></script>		 
+		<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+		<style type="text/css">
+			.shipping_div{
+				width: 500px;
+				height: 130px;
+				border: 1px solid;
+				margin: 5px;
+				padding: 5px;
+				background-color: #AAAAAA;
+				float: left;
+			}
+			.shipping_selected{
+				background-color: #666666;
+			}
+		</style>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				//加载所有收货地址
+				sendRequest("shipping/list.do",{},fillShippingsToPage);
+				//给每一个收货地址div 委托单击事件
+				$("#shippings").delegate("div","click",function(){
+					var shippingId = $(this).attr("name");
+					$("#shippings div[name != "+shippingId+"]").removeClass("shipping_selected");
+					$(this).toggleClass("shipping_selected");
+					if($("#shippingId").val() == shippingId)
+					{
+						$("#shippingId").val("");
+					}else{
+						$("#shippingId").val(shippingId);
+					}
+				});
+				//给更新地址按钮 添加点击事件
+				$("#update_shipping_button").click(function(){
+					var shippingId = $("#shippingId").val();
+					if(shippingId != null && shippingId != "")
+					{
+						location.href = "shipping_add_or_update.html?shippingId="+shippingId;
+					}else{
+						alert("请选择地址")
+					}
+				});
+				//给删除地址按钮 添加点击事件
+				$("#delete_shipping_button").click(function(){
+					var shippingId = $("#shippingId").val();
+					if(shippingId != null && shippingId != "")
+					{
+						sendRequest("shipping/delete_shipping.do",{"shippingId":shippingId},null);
+					}else{
+						alert("请选择地址")
+					}
+				});
+			});
+			//填充地址信息到页面
+			function fillShippingsToPage(shippings)
+			{
+				$(".new_add_shipping").remove();
+				if( shippings == null ) return;
+				for(var i=0; i<shippings.length; i++)
+				{
+					fillShippingToPage(shippings[i]);
+				}
+				$("#shippingId").val("");
+			}
+			
+			function fillShippingToPage(shipping)
+			{
+				var div = $("<div class='new_add_shipping' name='"+shipping.id+"' ></div>");
+				var p = $("<span>收货人："+shipping.receiverName+"&nbsp;&nbsp;</span>");
+				div.append(p).append("<br />");				
+				p = $("<span>手&nbsp;&nbsp;&nbsp;机："+shipping.receiverPhone+"</span>");
+				div.append(p).append("<br />");				
+				p = $("<span>电&nbsp;&nbsp;&nbsp;话："+shipping.receiverMobile+"</span>");
+				div.append(p).append("<br />");								
+				var address = shipping.receiverProvince+" "
+								+shipping.receiverCity+" "
+								+shipping.receiverDistrict+" "
+								+shipping.receiverAddress;
+				p = $("<span>地&nbsp;&nbsp;&nbsp;址："+address+"</span>");
+				div.append(p).append("<br />");;
+				p = $("<span>邮&nbsp;&nbsp;&nbsp;编："+shipping.receiverZip+"</span>");	
+				div.append(p).append("<br />");
+								
+				$(div).addClass("shipping_div");
+				$("#shippings").append(div);
+			}
+		</script>
+	</head>
+	<body>
+		
+		<div style="text-align: center;">
+			<span style="font-size: 16px;font-weight: bold;text-align: center;">收货地址管理</span>
+			<input id="shippingId" type="hidden" />
+			<hr />
+			<div id="tool" style="text-align: center;">
+				<a href="shipping_add_or_update.html">添加</a>&nbsp;&nbsp;
+				<a id="update_shipping_button" href="#">修改</a>&nbsp;&nbsp;
+				<a id="delete_shipping_button" href="#">删除</a>&nbsp;&nbsp;
+			</div>
+			<div id="shippings">
+				
+			</div>
+			<div id="oparate">
+				
+			</div>
+		</div>
+	</body>
+</html>

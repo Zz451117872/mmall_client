@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		
+		<title>用户登录</title>
+		<script type="text/javascript" src="../../js/common/jquery.js" ></script>
+		<script type="text/javascript" src="../../js/common/jquery.validate.js" ></script>
+		<script type="text/javascript" src="../../js/common/messages_zh.js" ></script>
+		<script type="text/javascript" src="../../js/common/jquery.cookie.js" ></script>
+		<script type="text/javascript" src="../../js/common/mmall.js" ></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				
+				//jquery validate 验证插件，获取验证器对象
+				var validater = $("#login_form").validate({
+					onfocusout: function(element) { $(element).valid(); }, //这句很重要，意思是在失去焦点时验证
+					rules:{
+						username:{		
+							required:true,
+							minlength:3,
+							maxlength:10
+						},
+						password:{
+							required:true,
+							minlength:3,
+							maxlength:10
+						}
+					}
+				});
+				
+				$("#login_button").click(function(){
+					if( validater.form() )
+					{
+						var data = getFormData("login_form"); // 获取form 组件的数据
+						sendRequest("user/login.do",data,loginFallback);	// 发送ajax请求，并以返回结果为参数调用回调函数
+					}
+					return false; // 取消默认的点击效果
+				});
+			});
+			// 登录回调函数						
+			function loginFallback(data)
+			{			// jquery cookie 插件 添加 cookie信息
+				$.cookie("mmall_username",data,{'expires':0.5,'path':'/mmall'});
+				var isManager = $("#isManager").val();
+				if(isManager == "true")
+				{
+					parent.location.href = "/mmall/src/manager/manager.html";
+				}else{
+					parent.location.href = "/mmall/index.html";
+				}
+			}
+		</script>		
+	</head>
+	<body>
+		<div style="height: 400px;width: 600px;margin: 0px auto;">
+			<h1>登录页面</h1>
+			<hr />
+			<form id="login_form" method="post" action="">
+				<p>
+					用户名：<input name="username" type="text" id="username" />
+				</p>
+				<p>
+					密&nbsp;&nbsp;&nbsp;码：<input name="password" type="password" id="password" /><br />		
+				</p>
+				<p>
+					角&nbsp;&nbsp;&nbsp;色：<select id="isManager" name="isManager">
+						<option value="false">普通用户</option>
+						<option value="true">管理员</option>			
+					</select>
+				</p>
+				<p>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<input id="login_button" type="submit" value="submit" />
+					<a href="../protal/user/check_aswer.html" id="forgetPassword">忘记密码</a>
+				</p>
+			</form>
+		</div>
+		
+	</body>
+</html>

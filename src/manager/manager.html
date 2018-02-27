@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>后台管理</title>
+		<script type="text/javascript" src="../../js/common/jquery.js" ></script>
+		<script type="text/javascript" src="../../js/common/jquery.cookie.js" ></script>
+		<script type="text/javascript" src="../../js/common/mmall.js" ></script>
+		<link rel="stylesheet" href="../../css/manager.css" />
+		<script type="text/javascript">
+			$(document).ready(function(){
+				//获取cookie username
+				var username = $.cookie("mmall_username");
+				//检查username 是否有管理员权限
+				if(username != null && username != "")
+				{
+					sendRequest("manager_user/check_role.do",{"username":username},checkRoleFallback);
+				}else{
+					location.href = "../../index.html";
+				}
+				
+//				window.setInterval(function(){
+//					sendRequest("manager_user/count_online.do",{},function(data){
+//						$("#online_user").text(data);
+//					})
+//				},3000);
+			});
+			
+			function checkRoleFallback(data)
+			{
+				if(data != "success")
+				{
+					location.href = "../../index.html";
+				}
+			}
+		</script>
+	</head>
+	<body style="height: 100%; width: 100%;">
+		<div id="top" style="height: 10%; width: 100%;">
+			<h1 style="text-align: center;">商城后台管理系统</h1>
+			<hr />
+			<span id="user_name"></span>&nbsp;&nbsp;					
+			<a href="../../index.html">回首页</a>&nbsp;&nbsp;
+			<a href="#">导入索引</a>&nbsp;&nbsp;
+			<a href="">注销</a>	&nbsp;&nbsp;
+			<span style="float: right;">在线人数：<span id="online_user">0</span>&nbsp;人&nbsp;&nbsp;&nbsp;&nbsp;</span>
+		</div>
+		<div id="manager_div" style="height: 90%; width: 100%; float: left;">
+			
+			<div id="manager_bar" style="height: 600px; width: 15%;">
+				<p><a href="category/category_list.html" target="manager_info">分类管理</a></p>
+				<p><a href="product/product_list.html" target="manager_info">产品管理</a></p>
+				<p><a href="order/order_list.html" target="manager_info">订单管理</a></p>
+				<p><a href="user/user_list.html" target="manager_info">用户管理</a></p>
+				<p><a href="#">支付信息</a></p>
+				<p><a href="">数据统计</a></p>			
+			</div>
+			
+			<div style="height: 100%; width: 85%; float: left;">
+				
+				<iframe name="manager_info" style="height: 600px; width: 100%;" />			
+			</div>
+		</div>
+	</body>
+</html>

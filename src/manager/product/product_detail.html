@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>产品详细</title>
+		<script type="text/javascript" src="../../../js/common/jquery.js" ></script>
+		<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				//获取传入页面的产品id参数
+				var productId = getParams("productId");
+				//拉取产品信息
+				if(productId != null)
+				{
+					sendRequest("manager_product/get_product_by_name_or_id.do",
+							{
+								"productId":productId
+							},
+							fillProductToPage
+						);
+				}
+			});
+						
+			//填充产品信息到页面
+			function fillProductToPage(product)
+			{
+				$("#id").text(product.id);
+				$("#categoryName").text(product.categoryName);
+				$("#name").text(product.name);
+				$("#subtitle").text(product.subtitle);
+				$("#mainImage").attr("src",product.mainImage);
+				$("#detail").text(product.detail);
+				$("#price").text(product.price);
+				$("#stock").text(product.stock);
+				$("#status").text(product.statusDesc);
+				$("#createTime").text(product.createTime);
+				$("#updateTime").text(product.updateTime);				
+			}
+			
+
+		</script>
+	</head>
+	<body>
+		<h3 style="text-align: center;">产品详细</h3>
+		<hr />
+		<div id="product_detail_info" style="height: 500px;width: 700px;border: 1px solid;margin: 0px auto;">
+			<div id="product_detail_top" style="height: 200px;width: 700px; ">
+				<span>产品ID：<span id="id">xxxx</span></span><br />
+				<span>产品名称：<span id="categoryName"> >xxxx</span></span><br />
+				<span>产品分类：<span id="name">>xxxx</span></span><br />
+				<span>产品标题：<span id="subtitle">>xxxx</span></span>
+			</div>
+			<div id="product_detail_bottom" style="height: 300px;width: 700px;border: 1px solid;">
+				<div id="product_detail_left" style="float: left;height: 300px;width: 300px;">
+					<img id="mainImage" src="" /><br />
+				</div>
+				<div id="product_detail_right" style="float: left;height: 300px;width: 400px;">
+					<span>产品详细：<span id="detail">xxxx</span></span><br />
+					<span>产品价格：<span id="price">xxxx</span></span><br />
+					<span>产品库存：<span id="stock">xxxx</span></span><br />
+					<span>产品状态：<span id="status">xxxx</span></span><br />
+					<span>上架时间：<span id="createTime">xxxx</span></span><br />
+					<span>更新时间：<span id="updateTime">xxxx</span></span><br />
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

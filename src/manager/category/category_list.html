@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!--
+        	作者：451117872@qq.com
+        	时间：2018-02-27
+        	描述：分类管理页面
+        -->
+		<meta charset="UTF-8">
+		<title>分类管理</title>
+		<script type="text/javascript" src="../../../js/common/jquery.js" ></script>
+		<style type="text/css">
+			.tr_selected_status{
+				background-color: #919191;
+			}
+		</style>
+		<script type="text/javascript" src="../../../js/common/common.js" ></script>
+		<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+		
+		<script type="text/javascript">
+			$(document).ready(function(){
+				//发送ajax请求，拉取所有顶级产品分类信息
+				sendRequest("manager_category/get_category.do",
+											{
+												"categoryId":null,
+												"isFillChild":false,
+												"pageNum":1,
+												"pageSize":3
+											},
+											fillCategorysToPage);
+				//对table的每一行tr 添加 委托事件
+				$("#category_table").delegate("tr:not(:first)","click",function(){
+					var categoryId = $(this).attr("name");
+					if($("#categoryId").val() == categoryId)
+					{
+						$("#categoryId").val("");
+					}else{
+						$("#categoryId").val(categoryId);
+					}		
+					$("table tr[name != "+categoryId+"]").removeClass("tr_selected_status");
+					$(this).toggleClass("tr_selected_status");				
+				});
+				//对删除分类按钮添加点击事件
+				$("#delete_category_button").click(function(){
+					var categoryId = $("#categoryId").val();
+					if(categoryId != null && categoryId != "")
+					{
+						sendRequest("manager_category/delete_category.do",{"categoryId":categoryId},"category_list.html");
+					}else{
+						alert("请选择分类");
+					}
+				});
+				//对更新分类按钮添加点击事件
+				$("#update_category_button").click(function(){
+					var categoryId = $("#categoryId").val();
+					if(categoryId != null && categoryId != "")
+					{
+						location.href = "category_add_or_update.html?categoryId="+categoryId;
+					}else{
+						alert("请选择分类")
+					}
+				});
+				//对查看子分类按钮添加点击事件
+				$("#select_child_button").click(function(){
+					var categoryId = $("#categoryId").val();
+					if(categoryId != null && categoryId != "")
+					{
+						sendRequest("manager_category/get_category.do",{
+										"categoryId":categoryId,
+										"isFillChild":false,
+										"pageNum":1,
+										"pageSize":3
+									},fillCategorysToPage);
+					}else{
+						alert("请选择分类")
+					}
+				});
+			});
+						
+			// 将获取的产品分类信息填充到页面
+			function fillCategorysToPage(result)
+			{
+				$(".new_add_tr").remove();
+				var categorys = result.list;
+				if(categorys != null)
+				{					
+					var elementParent = $("#category_table");
+					for(var i=0; i<categorys.length; i++)
+					{
+						var data = getData(categorys[i],"id,name,statusDesc,sortOrder,createTime,updateTime");						
+						fillDataToTable(data,elementParent);
+					}
+				}
+			}			
+		</script>
+	</head>
+	<body>
+		<div style="text-align: center;">
+			<span style="font-weight: bold;">分类信息管理</span><br />
+			<a href="">后退</a>&nbsp;&nbsp;<a href="">前进</a>
+		</div>
+		<hr />
+		<div id="category_info" style="border: 1px solid;">
+			<div id="category_top" style="text-align: center;">
+				<input id="categoryId" type="hidden" />
+				<a id='select_child_button' href="#">查看子分类</a>&nbsp;&nbsp;
+				<a href="category_add_or_update.html">新增</a>&nbsp;&nbsp;
+				<a id="update_category_button" href="#">编辑</a>&nbsp;&nbsp;
+				<a id="delete_category_button" href="#">删除</a>
+			</div>
+			<div id="category_centre">
+				<table id="category_table" style="margin: 0px auto;" border="1px solid">
+					<tr>
+						<td>id</td>
+						<td>分类名</td>
+						<td>状态</td>
+						<td>排序</td>
+						<td>创建时间</td>
+						<td>更新时间</td>						
+					</tr>
+				</table>
+			</div>
+			<div id="category_bottom" style="text-align: center;" >
+				<iframe id="pageIframeId"  name="pageIframe" src="/mmall/src/common/page.html" scrolling="no" width="500px" height="40px" frameborder="0"></iframe>
+			</div>
+		</div>
+	</body>
+</html>

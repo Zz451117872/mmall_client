@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>预订单</title>
+		<script type="text/javascript" src="../../../js/common/jquery.js" ></script>
+		<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+		<style type="text/css">
+			.shipping_selected_status{
+				background-color: #919191;
+			}
+			.shipping_div{
+				width: 500px;
+				height: 100px;
+				border: 1px solid;
+				float: left;
+				margin: 3px;
+			}
+		</style>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				
+				//加载所有的收货地址信息
+				sendRequest("shipping/list.do",{},loadMyAddressFallback);
+				
+				//获取传入页面的 购物条目id，并加载
+				var cartIds = getParams("cartIds");
+				if(cartIds != null)
+				{
+					sendRequest("cart/prepare_order.do",{"cartIds":cartIds},loadPrepareOrderFallback);
+					$("#cartIds").val(cartIds);
+				}
+				//对收货地址 table的每一行div 添加委托事件
+				$("#address_list").delegate("div","click",function(){
+					var shippingId = $(this).attr("name");
+					$("#address_list div[name!="+shippingId+"]").removeClass("shipping_selected_status");
+					$(this).toggleClass("shipping_selected_status");
+					if(shippingId == $("#selected_shipping").val())
+					{
+						$("#selected_shipping").val("");
+					}else{
+						$("#selected_shipping").val(shippingId);
+					}				
+				});
+			});
+			//加载所有收货地址回调函数							
+			function loadMyAddressFallback(shippings)
+			{
+				$(".new_add_shipping").remove();
+				if(shippings != null)
+				{
+					$(".new_add_shipping").remove();
+					for(var i=0; i<shippings.length; i++)
+					{
+						fillShippingToPage(shippings[i]);
+					}
+				}
+				$("#selected_shipping").val("");
+			}
+			//填充收货地址到页面
+			function fillShippingToPage(shipping)
+			{
+				var div = $("<div  name='"+shipping.id+"' class='new_add_shipping'></div>");
+				$(div).addClass("shipping_div");
+				var span = $("<span>收货人："+shipping.receiverName+"</span>");
+				div.append(span).append("<br />");
+				span = $("<span>电话："+shipping.receiverPhone+"</span>");
+				div.append(span).append("<br />");
+				var address = shipping.receiverProvince+"&nbsp;"+
+						shipping.receiverCity+"&nbsp;"+
+						shipping.receiverDistrict+"&nbsp;"+
+						shipping.receiverAddress+"&nbsp;";
+				span = $("<span>收货地址："+address+"</span>");
+				div.append(span).append("<br />");
+				span = $("<span>邮编："+shipping.receiverZip+"</span>");
+				div.append(span);
+				
+				$("#address_list").append(div);
+			}
+			//加载预订单回调函数
+			function loadPrepareOrderFallback(data)
+			{
+				if(data != null){
+					var cartItems = data.cartItemVOList;
+					if(cartItems != null)
+					{
+						$(".new_add_cart").remove();
+						for(var i=0; i<cartItems.length; i++)
+						{
+							fillCartItemToPage(cartItems[i]);
+						}
+						$("#currentTotalPrice").text(data.cartTotalPrice);
+						$("#currentTotalQuantity").text(data.cartTotalQuantity);
+					}	
+				}
+			}
+			//填充订单条目到页面
+			function fillCartItemToPage(cartItem)
+			{
+				var tr = $("<tr name='"+cartItem.id+"' class='new_add_cart'></tr>");
+				td = $("<td>"+cartItem.id+"</td>");
+				tr.append(td);
+				td = $("<td>"+cartItem.productName+"</td>");
+				tr.append(td);
+				td = $("<td>"+cartItem.productSubtitle+"</td>");
+				tr.append(td);
+				td = $("<td><img src='"+cartItem.productMainImage+"' /></td>");
+				tr.append(td);
+				td = $("<td>"+cartItem.productPrice+"</td>");
+				tr.append(td);
+				
+				td = $("<td>"+cartItem.quantity+"</td>");
+				tr.append(td);
+				
+				td = $("<td><span id='"+"stock"+cartItem.id+"'>"+cartItem.productStock+"</span></td>");
+				tr.append(td);
+				td = $("<td><span id='"+"productTotalPrice"+cartItem.id+"'>"+cartItem.productTotalPrice+"</span></td>");
+				tr.append(td);
+				td = $("<td>"+cartItem.createTime+"</td>");
+				tr.append(td);
+				
+				$("#prepare_order_table").append(tr);
+			}
+			//创建订单函数							
+			function createOrder()
+			{
+				var cartIds = $("#cartIds").val();
+				var shippingId = $("#selected_shipping").val();
+				if(cartIds != null && shippingId != null && shippingId != "")
+				{
+					sendRequest("order/create_order.do",{"cartIds":cartIds,"shippingId":shippingId},"../order/order_list.html");
+				}else{
+					alert("请选择商品和收货地址");
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<input id="selected_shipping" type="hidden" value="" />
+		<input id="cartIds" type="hidden" value="" />
+		<hr />
+		<div>
+			<div style="text-align: center;">
+				<a href="../shipping/shipping_list.html">地址管理</a>&nbsp;&nbsp;				
+			</div>
+			<div id="address_list" >
+				
+			</div>
+			
+			<div id="cart_list" style="clear: both;">
+				<hr />
+				<table style="margin: 0px auto;" id="prepare_order_table" border="1px solid">
+					<tr>
+						<td>id</td>
+						<td>名称</td>
+						<td>小标题</td>
+						<td>主图</td>
+						<td>价格</td>
+						<td>数量</td>
+						<td>库存</td>
+						<td>小计</td>
+						<td>下单时间</td>
+					</tr>
+				</table>
+			</div>
+			<hr />
+			<div id="prepare_order_bottom" style="text-align: center;">
+					<span>共<span id="currentTotalQuantity">0</span>件</span>
+					<span>花费￥<span id="currentTotalPrice">0</span>元</span><br />
+					<span><a href="#" onclick="createOrder();">创建订单</a></span>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>产品管理</title>
+	<script type="text/javascript" src="../../../js/common/jquery.js" ></script>
+	<style type="text/css">
+			.tr_selected_status{
+				background-color: #919191;
+			}
+		</style>
+	<script type="text/javascript" src="../../../js/common/common.js" ></script>
+	<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+	<script type="text/javascript" src="../../../js/manager/product/product_list.js" ></script>
+	
+	</head>
+	<body>
+		<h3 style="text-align: center;">产品管理</h3>
+		<input id="productId" type="hidden" />
+		<hr />
+		<div id="product_info">
+			<div id="product_top">
+				<div style="text-align: center;">
+					<span><input class="input_class" id="product_id" type="text" value="按ID查找" />
+					<button id="searchProductById">GO</button></span>
+					<br />
+					<span><input class="input_class" id="product_keyword" type="text" value="按关键字查找" />
+					<button id="searchProductByKeyword">GO</button></span>
+					<br />
+					<span><select id="product_category">
+						<option value="0">   选择分类      </option>
+					</select></span><br />
+				</div>
+				<div style="text-align: center;">		
+					<a href="#" onclick="productDetail();">查看详细</a>&nbsp;&nbsp;
+					<a href="product_add_or_update.html">新增</a>&nbsp;&nbsp;
+					<a id="update_product" href="#" onclick="updateProduct();">修改</a>&nbsp;&nbsp;
+					<a id="productStatusButton" href="#" onclick="soldOut();">下架</a>
+				</div>
+			</div>
+			<div id="product_centre">
+				<table style="margin: 0px auto;" id="product_table" border="1px solid">
+					<tr>
+						<td>id</td>
+						<td>分类</td>
+						<td>产品名称</td>
+						<td>标题</td>
+						<td>主图</td>
+						<td>详细</td>
+						<td>价格</td>
+						<td>库存</td>
+						<td>状态</td>
+						<td>上架时间</td>
+						<td>修改时间</td>
+					</tr>
+				</table>
+			</div>
+			<div id="product_bottom" style="text-align: center;">
+				<iframe id="pageIframeId" name="pageIframe" src="/mmall/src/common/page.html" scrolling="no" width="500px" height="40px" frameborder="0"></iframe>
+			</div>
+		</div>
+	</body>
+</html>

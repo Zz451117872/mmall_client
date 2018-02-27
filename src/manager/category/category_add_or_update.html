@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!--
+        	作者：451117872@qq.com
+        	时间：2018-02-27
+        	描述：添加产品分类 ，修改产品分类
+        -->
+		<meta charset="UTF-8">
+		<title>添加分类，修改分类</title>
+		<script type="text/javascript" src="../../../js/common/jquery.js" ></script>
+		<script type="text/javascript" src="../../../js/common/jquery.validate.js" ></script>
+		<script type="text/javascript" src="../../../js/common/messages_zh.js" ></script>		
+		<script type="text/javascript" src="../../../js/common/common.js" ></script>
+		<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+		<script type="text/javascript">
+			$(document).ready(function(){	
+				//获取传入页面的 产品分类id
+				var categoryId = getParams("categoryId");
+				
+				
+				(function(){
+					//拉取所有 产品分类信息
+					sendRequest("manager_category/get_category.do",
+							{
+								"categoryId":null,
+								"isFillChild":true
+							},
+							loadAllCategoryFallback
+						);	
+					//当传入产品分类id不为空时，表示为更新操作，否则为添加操作
+					if( categoryId != null && categoryId != "")
+					{
+						sendRequest("manager_category/get_category_by_id.do",
+								{
+									"categoryId":categoryId
+								},
+								fillCategoryToPage
+								);
+						$(".is_update").show();
+					}else{
+						$(".is_update").hide();
+					}
+				})();
+				
+				//jquery validate 组件获取验证器对象			
+				var validater = $("#category_add_or_update_form").validate({
+					onfocusout: function(element) { $(element).valid(); }
+				});
+				//对 产品分类修改或者添加 按钮 添加点击事件
+				$("#category_add_or_update_submit").click(function(){
+					if( validater.form() ){
+						var data = getFormData("category_add_or_update_form");
+						sendRequest("manager_category/save_or_update_category.do",
+								data,
+								"category_list.html");
+					}
+					
+					return false;//禁止默认行为
+				});
+				// 对 更新产品分类状态按钮 添加点击事件		
+				$("#updateCategoryStatus").click(function(){
+					if($("#status").val() == "true")
+					{
+						$("#status").val("false");
+						$(this).text("启用");
+						$("#statusDesc").val("已停用");
+					}else{
+						$("#status").val("true");
+						$(this).text("停用");
+						$("#statusDesc").val("使用中");
+					}
+					return false;
+				});
+			});
+			
+			//当为更新操作时，需要填充产品分类信息
+			function fillCategoryToPage(category)
+			{
+				if(category.status == true)
+				{
+					$("#updateCategoryStatus").text("停用");
+				}else{
+					$("#updateCategoryStatus").text("启用");
+				}
+				$("#id").val(category.id);
+				$("#name").val(category.name);
+				$("#statusDesc").val(category.statusDesc);
+				$("#status").val(category.status);
+				$("#sortOrder").val(category.sortOrder);
+				
+				//在父分类select组件中，要显示当前产品分类的父分类，所以需要在所有分类信息加载完毕后再选择父分类
+				var target = $("#parent_id").find("option[value = '"+category.parentCategory+"']");
+				var count = 0;
+				while( target == null && count < 100000 )
+				{
+					target = $("#parent_id").find("option[value = '"+category.parentCategory+"']");
+					count ++ ;
+				}
+				target.attr("selected","selected");
+			}
+						
+			//加载所有产品分类信息到select组件中
+			function loadAllCategoryFallback(categorys)
+			{
+				$(".new_add_category").remove();
+				if(categorys != null)
+				{					
+					for(var i=0; i<categorys.length; i++)
+					{
+						var _select = $("#parent_id");
+						fillCategoryToSelect(categorys[i],_select,0);							
+					}
+				}
+			}
+			
+			function fillCategoryToSelect(category,_select,interval)
+			{
+				var nbsp = "";
+				for(var i=0; i<interval; i++)
+				{
+					nbsp = nbsp+"&nbsp;";
+				}	
+				var option = $("<option class='new_add_category' value='"+category.id+"'>"+nbsp+category.name+nbsp+"</option>");
+				_select.append(option);
+				if(category.childs != null)
+				{
+					for(var i=0; i<category.childs.length; i++)
+					{
+						fillCategoryToSelect(category.childs[i],_select,interval+3);
+					}
+				}
+			}
+										
+		</script>
+	</head>
+	<body>
+		<h3 style="text-align: center;">添加分类，修改分类</h3>
+		<hr />
+		<div >
+			<div >
+			<form id="category_add_or_update_form" method="post">
+				
+				<input id="status" type="hidden" name="status"/>
+				<span class="is_update">分类&nbsp;&nbsp;&nbsp;ID:<input id="id" type="text" name="id"/><br /></span>
+				<span>分类名称:<input id="name" type="text" name="name"/><br /></span>
+				<span class="is_update">分类状态:<input id="statusDesc" type="text"/>
+						<button id="updateCategoryStatus"></button>	<br /></span>
+				<span>分类排序:<input id="sortOrder" type="text" name="sortOrder"/></span><br />
+				<span>父分类:<select name="parentId" id="parent_id">
+					<option value="0">顶级分类</option>
+				</select></span><br />
+				<span><input id="category_add_or_update_submit" type="submit" value="submit"/></span><br />
+			</form>
+			</div>
+		</div>
+	</body>
+</html>

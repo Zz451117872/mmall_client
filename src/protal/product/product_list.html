@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<script type="text/javascript" src="../../../js/common/jquery.js" ></script>
+		<script type="text/javascript" src="../../../js/common/common.js" ></script>
+		<script type="text/javascript" src="../../../js/common/mmall.js" ></script>
+		<script type="text/javascript" >
+			$(document).ready(function(){	
+				//获取传入页面的 产品名称关键字 和 产品分类id
+				var keyword = getParams("keyword");
+				var categoryId = getParams("categoryId");
+				//通过 产品名称关键字 或者  产品分类id 拉取产品集合
+				if(keyword != null || categoryId != null){
+					sendRequest("product/list.do",{
+							"keyword":keyword,
+							"categoryId":categoryId,
+							"pageNum":1,
+							"pageSize":6,
+							"orderBy":"createTime_desc"
+						},fillProductsToPage);
+				}else{
+					alert("参数缺失")
+				}
+				//给产品table中 class值为 dis_quantity 委托点击事件	
+				$("#products").delegate(".dis_quantity","click",function(){
+					var productId = $(this).attr("name");
+					var quantity = Number($("#"+"quantity"+productId+"").val())-1;
+					quantity = quantity < 1 ? 1:quantity;
+					$("#"+"quantity"+productId+"").val(quantity);
+				});
+				//给产品table中 class值为 add_quantity 委托点击事件	
+				$("#products").delegate(".add_quantity","click",function(){
+					
+					var productId = $(this).attr("name");
+					var stock = $("#"+"stock"+productId+"").text();
+					var quantity = Number($("#"+"quantity"+productId+"").val())+1;
+					quantity = parseInt(quantity) > parseInt(stock) ? stock:quantity;
+					$("#"+"quantity"+productId+"").val(quantity);
+				});
+				//给产品table中 class值为 buy 委托点击事件
+				$("#products").delegate(".buy","click",function(){
+					var productId = $(this).attr("name");
+					var quantity = $("#"+"quantity"+productId+"").val();
+					if(productId != null && productId != "" && quantity != null && quantity != ""){
+						sendRequest("cart/add_cart.do",{
+								"productId":productId,
+								"quantity":quantity}
+								,"../cart/cart_list.html");
+					}else{
+						alert("参数缺失")
+					}		
+				});
+				//给产品table中 class值为 quantity 委托获取焦点事件
+				$("#products").delegate(".quantity","focus",function(){
+					$(this).val("");
+				});
+				//给产品table中 class值为 quantity 委托失去焦点事件
+				$("#products").delegate(".quantity","blur",function(){
+					var productId = $(this).attr("name");
+					var stock = $("#"+"stock"+productId+"").text();
+					var quantity = Number($("#"+"quantity"+productId+"").val());
+					quantity = quantity < 1 ? 1:quantity;
+					quantity = parseInt(quantity) > parseInt(stock) ? stock:quantity;
+					$("#"+"quantity"+productId+"").val(quantity);
+				});
+			});
+			
+			//填充产品信息到页面
+			function fillProductsToPage(result)
+			{
+				if( result != null )
+				{
+					var products = result.list;
+					$(".new_add").remove();
+					if(products != null)
+					{					
+						for(var i=0; i<products.length; i++)
+						{
+							var div = fillProductToPage(products[i]);
+							$("#products").append(div);
+						}
+					}
+				}
+				
+			}
+			
+			function fillProductToPage(product)
+			{
+				var div = $("<div class='new_add' style='width: 330px; height: 300px; border: 1px solid; float: left; margin: 2px;'></div>");
+				
+				var top = $("<div style='text-align: center;'></div>");
+				var span = $("<span id='"+product.id+"'><a href='product_detail.html?productId="+product.id+"'>"+product.name+"</a><br></span>");
+				top.append(span);
+				span = $("<span>"+product.subtitle+"<br></span>");
+				top.append(span);
+				span = $("<span>"+product.detail+"<br></span>");
+				top.append(span);
+				div.append(top);
+				
+				var center = $("<div></div>");
+				var left = $("<div style='float: left;'></div>");
+				var img = $("<img style='width: 200px; height: 200px;' />");
+				$(img).attr("src",product.mainImage);
+				left.append(img);
+				
+				var right = $("<div style='float: left;'></div>");
+				span = $("<span>价格："+product.price+"<br></span>");
+				right.append(span);
+				span = $("<span>库存：<span id='"+"stock"+product.id+"'>"+product.stock+"</span><br></span>");
+				right.append(span);
+				span = $("<span>"+product.statusDesc+"<br></span>");
+				right.append(span);
+				
+				var disQuantiry = $("<button name='"+product.id+"' class='dis_quantity'>-</button>");
+				var quantity = $("<input name='"+product.id+"' class='quantity' id='"+"quantity"+product.id+"' type='text' value='1' style='width: 40px;' />")
+				var addQuantiry = $("<button name='"+product.id+"' class='add_quantity'>+</button>");
+				var buy = $("<button name='"+product.id+"' class='buy'>购买</button>");
+				
+				right.append(disQuantiry).append(quantity).append(addQuantiry).append("<br />").append(buy);	
+				center.append(left).append(right);	
+				div.append(center);	
+				return div;
+			}
+		</script>
+	</head>
+	<body>
+		<div id="products">
+			
+			
+		</div>
+		
+		<div style="text-align: center;clear: both;">
+			<iframe id="pageIframeId" name="pageIframe" src="/mmall/src/common/page.html" scrolling="no" width="500px" height="40px" frameborder="0"></iframe>
+		</div>
+	</body>
+</html>
