@@ -87,7 +87,7 @@
 			
 			function fillProductToPage(product)
 			{
-				var div = $("<div class='new_add' style='width: 330px; height: 300px; border: 1px solid; float: left; margin: 2px;'></div>");
+				var div = $("<div class='new_add' style='width: 500px; height: 400px; border: 1px solid; float: left; margin: 2px;'></div>");
 				
 				var top = $("<div style='text-align: center;'></div>");
 				var span = $("<span id='"+product.id+"'><a href='product_detail.html?productId="+product.id+"'>"+product.name+"</a><br></span>");
@@ -100,7 +100,7 @@
 				
 				var center = $("<div></div>");
 				var left = $("<div style='float: left;'></div>");
-				var img = $("<img style='width: 200px; height: 200px;' />");
+				var img = $("<img style='width: 300px; height: 300px;' />");
 				$(img).attr("src",product.mainImage);
 				left.append(img);
 				

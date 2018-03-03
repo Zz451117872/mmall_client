@@ -55,7 +55,7 @@
 					var categoryId = $("#categoryId").val();
 					if(categoryId != null && categoryId != "")
 					{
-						location.href = "category_add_or_update.html?categoryId="+categoryId;
+						location.href = "category_add_or_update.html?categoryId="+categoryId+"&time="+new Date();
 					}else{
 						alert("请选择分类")
 					}
