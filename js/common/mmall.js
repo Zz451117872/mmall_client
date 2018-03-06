@@ -4,7 +4,7 @@
  */
 
 //项目请求地址前缀
-var url_prefix = "http://120.79.50.238:8021/mmall_client/";
+var url_prefix = "http://120.79.50.238:8021/mmall/";
 //var url_prefix = "http://localhost:8021/apis/";
 
 /*
