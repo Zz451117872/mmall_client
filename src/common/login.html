@@ -41,7 +41,7 @@
 			// 登录回调函数						
 			function loginFallback(data)
 			{			// jquery cookie 插件 添加 cookie信息
-				$.cookie("mmall_username",data,{'expires':0.5,'path':'/mmall'});
+				$.cookie("mmall_username",data,{'expires':0.5,'path':'/mmall_client'});
 				var isManager = $("#isManager").val();
 				if(isManager == "true")
 				{

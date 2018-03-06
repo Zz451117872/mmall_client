@@ -68,6 +68,6 @@ function initPage()
 
 function quitFallback()
 {	
-	$.cookie("mmall_username","x",{'expires':-10,'path':'/mmall'});
+	$.cookie("mmall_username","x",{'expires':-10,'path':'/mmall_client'});
 	location.href = "index.html";
 }
